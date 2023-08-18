@@ -1,5 +1,6 @@
 ;;; org-excalidraw.el --- Tools for working with excalidraw drawings -*- lexical-binding: t; -*-
 ;; Copyright (C) 2022 David Wilson
+;; Copyright (C) 2023 YiFeiTao
 
 ;; Author:  David Wilson <wdavew@gmail.com>
 ;; URL: https://github.com/wdavew/org-excalidraw
@@ -7,6 +8,11 @@
 ;; Version: 0.1.0
 ;; Keywords: convenience, outlines
 ;; Package-Requires: ((org "9.3") (emacs "26.1"))
+
+;; Author:  YiFeiTao <yifeitao@gmail.com>
+;; URL: https://github.com/ifeitao/org-excalidraw
+;; Created: 2023
+;; Version: 0.2.0
 
 ;; Permission is hereby granted, free of charge, to any person
 ;; obtaining a copy of this software and associated documentation
@@ -105,7 +111,7 @@
   (interactive)
   (let* ((filename (format "%s.excalidraw" (org-id-uuid)))
          (path (expand-file-name filename org-excalidraw-directory))
-         (link (format "[[excalidraw:%s.svg]]" path)))
+         (link (format "[[file:%s.svg]]" path)))
     (org-excalidraw--validate-excalidraw-file path)
     (insert link)
     (with-temp-file path (insert org-excalidraw-base))
@@ -121,14 +127,6 @@
      "Excalidraw directory %s does not exist"
      org-excalidraw-directory))
   (file-notify-add-watch org-excalidraw-directory '(change) 'org-excalidraw--handle-file-change)
-  (org-link-set-parameters "excalidraw"
-                           :follow 'org-excalidraw--open-file-from-svg
-                           :image-data-fun (lambda (_protocol link _desc)
-                                             (with-temp-buffer (insert-file-contents-literally link)
-                                                               (buffer-substring-no-properties
-                                                                (point-min)
-                                                                (point-max))))))
-
-
+  (add-to-list 'org-file-apps '("\\.excalidraw.svg\\'" . (lambda (file link) (org-excalidraw--open-file-from-svg link)))))
 (provide 'org-excalidraw)
 ;;; org-excalidraw.el ends here
