@@ -109,6 +109,12 @@
 (defun org-excalidraw-create-drawing ()
   "Create an excalidraw drawing and insert an 'org-mode' link to it at Point."
   (interactive)
+
+  ;; Create org-excalidraw-directory with parent directories if needed
+  (unless (file-directory-p org-excalidraw-directory)
+    (make-directory org-excalidraw-directory :parents)
+    (org-excalidraw-initialize))
+
   (let* ((filename (format "%s.excalidraw" (org-id-uuid)))
          (path (expand-file-name filename org-excalidraw-directory))
          (link (format "[[file:%s.svg]]" path)))
@@ -122,10 +128,10 @@
 (defun org-excalidraw-initialize ()
   "Setup excalidraw.el. Call this after 'org-mode initialization."
   (interactive)
-  (unless (file-directory-p org-excalidraw-directory)
-    (error
-     "Excalidraw directory %s does not exist"
-     org-excalidraw-directory))
+  ;;(unless (file-directory-p org-excalidraw-directory)
+  ;;  (error
+  ;;   "Excalidraw directory %s does not exist"
+  ;;   org-excalidraw-directory))
   (file-notify-add-watch org-excalidraw-directory '(change) 'org-excalidraw--handle-file-change)
   (add-to-list 'org-file-apps '("\\.excalidraw.svg\\'" . (lambda (file link) (org-excalidraw--open-file-from-svg link)))))
 (provide 'org-excalidraw)
